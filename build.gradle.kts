@@ -68,9 +68,9 @@ publishing {
         }
         publications {
             create<MavenPublication>("maven") {
-                groupId = "celestialexpressions"
-                artifactId = "celestialexpressions"
-                version = "1.1"
+//                groupId = "celestialexpressions"
+//                artifactId = "celestialexpressions"
+//                version = "1.1"
 
                 from(components["java"])
             }
