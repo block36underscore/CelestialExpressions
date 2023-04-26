@@ -9,6 +9,8 @@ import java.net.URI
  */
 
 version = "0.1"
+group = "celestialexpressions"
+name = "celestialexpressions"
 
 tasks.jar {
     manifest {
