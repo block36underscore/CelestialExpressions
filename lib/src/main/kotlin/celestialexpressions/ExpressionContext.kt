@@ -74,7 +74,7 @@ data class ExpressionContext(val modules: ArrayList<Module> = ArrayList()) {
     }
 
     fun scanVariableConflicts(name: String) {
-        var found = ArrayList<String>()
+        val found = ArrayList<String>()
         for (module in modules) {
             if (module.hasVariable(name)) found.add(module.name)
         }
@@ -85,7 +85,7 @@ data class ExpressionContext(val modules: ArrayList<Module> = ArrayList()) {
             if (module.hasFunction(name)) return true
         return false
     }
-    fun getFunction(name: String): Function {
+    fun getFunction(name: String): GenericFunction {
         scanFunctionConflicts(name)
         for (module in modules) {
             if (module.hasFunction(name)) return module.getFunction(name)
@@ -93,7 +93,7 @@ data class ExpressionContext(val modules: ArrayList<Module> = ArrayList()) {
         throw NoSuchFunctionException("No variable named $name is declared")
     }
     fun scanFunctionConflicts(name: String) {
-        var found = ArrayList<String>()
+        val found = ArrayList<String>()
         for (module in modules) {
             if (module.hasFunction(name)) found.add(module.name)
         }
@@ -109,7 +109,8 @@ class ConflictException(variable: String, modules: ArrayList<String>):
 open class Module(
     val name: String,
     private val variables: VariableList = VariableList(),
-    private val functions: FunctionList = FunctionList()
+    private val functions: FunctionList = FunctionList(),
+    private val stringFunctions: StringFunctionList = StringFunctionList(),
 ) {
 
     fun getVariable(name: String) = this.variables.getVariable(name.split(':').last())
@@ -120,13 +121,19 @@ open class Module(
         else false
     }
 
-    fun getFunction(name: String) = this.functions.getFunction(name.split(':').last())
+    fun getFunction(name: String) =
+        this.functions.getFunction(name.split(':').last()) ?:
+        this.stringFunctions.getStringFunction(name.split(':').last()) ?:
+        throw AssemblyError("function $name is not declared")
+
+
     fun hasFunction(name: String): Boolean {
         val split = name.split(':')
         if (split.size > 2) throw NoSuchFunctionException("celestialexpressions.Function name $name is illegal, cannot have more than one colon")
-        return if (split[0] == this.name || split.size == 1) this.functions.hasFunction(split.last())
+        return if (split[0] == this.name || split.size == 1) this.functions.hasFunction(split.last()) || this.stringFunctions.hasStringFunction(split.last())
         else false
     }
+
 }
 class ModuleBuilder(val name: String) {
     private val variables = VariableList()

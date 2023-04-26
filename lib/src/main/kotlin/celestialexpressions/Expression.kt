@@ -26,7 +26,7 @@ fun interface Expression: ()->Double {
 
     class Negate(expression: Expression) : UnaryOperator(expression) {
         override fun toString() = "-${this.expression}"
-        override fun invoke() = -expression.invoke()
+        override fun invoke() = -expression()
         constructor(): this(Empty())
     }
 
@@ -35,27 +35,27 @@ fun interface Expression: ()->Double {
     }
 
     class Add(lhs: Expression, rhs: Expression) : BinaryOperator(lhs, rhs) {
-        override fun invoke() = LHS.invoke() + RHS.invoke()
+        override fun invoke() = LHS() + RHS()
         constructor(): this(Empty(), Empty())
     }
 
     class Sub(lhs: Expression, rhs: Expression) : BinaryOperator(lhs, rhs) {
-        override fun invoke() = LHS.invoke() - RHS.invoke()
+        override fun invoke() = LHS() - RHS()
         constructor(): this(Empty(), Empty())
     }
 
     class Mul(lhs: Expression, rhs: Expression) : BinaryOperator(lhs, rhs) {
-        override fun invoke() = LHS.invoke() * RHS.invoke()
+        override fun invoke() = LHS() * RHS()
         constructor(): this(Empty(), Empty())
     }
 
     class Div(lhs: Expression, rhs: Expression) : BinaryOperator(lhs, rhs) {
-        override fun invoke() = LHS.invoke() / RHS.invoke()
+        override fun invoke() = LHS() / RHS()
         constructor(): this(Empty(), Empty())
     }
 
     class Pow(lhs: Expression, rhs: Expression) : BinaryOperator(lhs, rhs) {
-        override fun invoke() = LHS.invoke().pow(RHS.invoke())
+        override fun invoke() = LHS().pow(RHS())
         constructor(): this(Empty(), Empty())
     }
 
@@ -65,32 +65,37 @@ fun interface Expression: ()->Double {
     }
 
     class And(lhs: Expression, rhs: Expression) : PseudoBoolean(lhs, rhs) {
-        override fun operation() = LHS.invoke() == 1.0 && RHS.invoke() == 1.0
+        override fun operation() = LHS() == 1.0 && RHS() == 1.0
         constructor(): this(Empty(), Empty())
     }
 
     class Or(lhs: Expression, rhs: Expression) : PseudoBoolean(lhs, rhs) {
-        override fun operation() = LHS.invoke() == 1.0 || RHS.invoke() == 1.0
+        override fun operation() = LHS() == 1.0 || RHS() == 1.0
         constructor(): this(Empty(), Empty())
     }
 
     class Eq(lhs: Expression, rhs: Expression) : PseudoBoolean(lhs, rhs) {
-        override fun operation() = LHS.invoke() == RHS.invoke()
+        override fun operation() = LHS() == RHS()
         constructor(): this(Empty(), Empty())
     }
 
     class Gtr(lhs: Expression, rhs: Expression) : PseudoBoolean(lhs, rhs) {
-        override fun operation() = LHS.invoke() > RHS.invoke()
+        override fun operation() = LHS() > RHS()
         constructor(): this(Empty(), Empty())
     }
 
     class Lss(lhs: Expression, rhs: Expression) : PseudoBoolean(lhs, rhs) {
-        override fun operation() = LHS.invoke() < RHS.invoke()
+        override fun operation() = LHS() < RHS()
         constructor(): this(Empty(), Empty())
     }
 
     class Fun(val params: ArrayList<Expression>, val function: Function) : Expression {
-        override fun invoke() = function.invoke(params)
+        override fun invoke() = function(params)
+    }
+    
+    class StrFun(val string: String, val function: StringFunction) : Expression {
+        override fun invoke() = function.invoke(string)
+        override fun toString() = "StrFun(${this.string})"
     }
 }
 

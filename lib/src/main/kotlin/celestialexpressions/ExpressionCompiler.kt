@@ -75,14 +75,21 @@ fun processFunction(token: Token, tokens: ListIterator<Token>, context: Expressi
         }
         params.add(subTokenArray)
     }
-    val expressions = ArrayList<Expression>()
-    params.forEach {
-        expressions.add(buildExpressionTree(it, context).getExpression())
-    }
+
     val function = context.getFunction(name)
-    if (function.size?.equals(params.size) == false) throw InvalidExpressionError(
-        "celestialexpressions.Function $name takes ${function.size} parameter${if (function.size == 1) "" else "s"}, but ${params.size} ${if(params.size==1) "was" else "were"} provided")
-    return Expression.Fun(expressions, context.getFunction(name))
+    return when (function) {
+        is Function -> {
+            val expressions = ArrayList<Expression>()
+            params.forEach {
+                expressions.add(buildExpressionTree(it, context).getExpression())
+            }
+            if (function.size?.equals(params.size) == false) throw InvalidExpressionError(
+                "celestialexpressions.Function $name takes ${function.size} parameter${if (function.size == 1) "" else "s"}, but ${params.size} ${if (params.size == 1) "was" else "were"} provided"
+            )
+            Expression.Fun(expressions, function)
+        }
+        is StringFunction -> Expression.StrFun(params[0][0].text, function)
+    }
 }
 
 interface ExpressionTreeElement
@@ -175,14 +182,18 @@ class ExpressionTreeBuilder(var start: Expression) {
         )
         else {
             if (this.elements.isEmpty()) {
-                if (this.start is Expression.Empty) this.start = element
-                else if (this.start is Expression.UnaryOperator) (this.start as Expression.UnaryOperator).expression = element
-                else this.start = Expression.Mul(this.start, element)
+                when (this.start) {
+                    is Expression.Empty -> this.start = element
+                    is Expression.UnaryOperator -> (this.start as Expression.UnaryOperator).expression = element
+                    else -> this.start = Expression.Mul(this.start, element)
+                }
             } else {
                 val last = this.elements.last()
-                if (last.element is Expression.Empty) last.element = element
-                else if (last.element is Expression.UnaryOperator) (last.element as Expression.UnaryOperator).expression = element
-                else last.element = Expression.Mul(last.element, element)
+                when (last.element) {
+                    is Expression.Empty -> last.element = element
+                    is Expression.UnaryOperator -> (last.element as Expression.UnaryOperator).expression = element
+                    else -> last.element = Expression.Mul(last.element, element)
+                }
             }
         }
     }
