@@ -10,7 +10,7 @@ import java.net.URI
 
 version = "0.1"
 group = "celestialexpressions"
-name = "celestialexpressions"
+//name = "celestialexpressions"
 
 tasks.jar {
     manifest {
@@ -68,9 +68,9 @@ publishing {
         }
         publications {
             create<MavenPublication>("maven") {
-//                groupId = "celestialexpressions"
-//                artifactId = "celestialexpressions"
-//                version = "1.1"
+                groupId = "celestialexpressions"
+                artifactId = "celestialexpressions"
+                version = "1.1"
 
                 from(components["java"])
             }
