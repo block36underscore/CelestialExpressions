@@ -13,7 +13,7 @@ fun splitTokens(input: String): ArrayList<BasicToken> {
 
     //Keep track of special characters that may only be used a certain number of times in a token
     var dots = 0
-    for (i in 0 until input.length) {
+    for (i in input.indices) {
         val c = "" + input[i]
 
         // Ignore Whitespace and '#' symbol (for legacy reasons, may be changed in the future)
