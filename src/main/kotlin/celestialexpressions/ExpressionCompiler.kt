@@ -8,9 +8,8 @@ fun compile(source: String, context: ExpressionContext): Expression =
     validateExpression(
     identifyTokens(
     splitTokens(
-    source)
-    )
-    ), context) as Expression
+    removeIrrelevantChars(
+    source)))), context) as Expression
 
 fun compile(source: String) = compile(source, ExpressionContext())
 

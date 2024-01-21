@@ -4,6 +4,40 @@ package celestialexpressions
 
 import java.util.regex.Pattern
 
+fun removeIrrelevantChars(input: String): String {
+    val out = StringBuilder()
+
+    var inStringD = false
+    var inStringS = false
+
+    input.iterator().forEach {
+        if (inStringD || inStringS) {
+            when (it) {
+                '"' -> {
+                    inStringD = false
+                }
+                '\'' -> {
+                    inStringS = false
+                }
+            }
+            out.append(it)
+        } else when (it) {
+            '"' -> {
+                out.append(it)
+                inStringD = true
+            }
+            '\'' -> {
+                out.append(it)
+                inStringS = true
+            }
+            else -> if (!Pattern.matches("[\\s#]", it.toString())) {
+                out.append(it)
+            }
+        }
+    }
+
+    return out.toString()
+}
 @Throws(ParsingError::class)
 fun splitTokens(input: String): ArrayList<BasicToken> {
     val out = ArrayList<BasicToken>()
@@ -110,7 +144,7 @@ fun identifyTokens(input: ArrayList<BasicToken>): ArrayList<Token> {
                     }
                     ")" -> TokenType.GROUPING_END
                     else -> {
-                        when (token.text[token.text.length-1]) {
+                        when (token.text.last()) {
                             '(' -> TokenType.GROUPING_START
                             ')' -> TokenType.NULLARY
                             ',' -> TokenType.SPLITTER
