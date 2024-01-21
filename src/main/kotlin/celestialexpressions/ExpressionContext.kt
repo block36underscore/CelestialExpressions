@@ -28,28 +28,28 @@ val STANDARD_MODULE: Module = Module("std",
 
         )),
     FunctionList(hashMapOf(
-        "min" to Function({ arr -> min(arr[0], arr[1]) },2),
-        "max" to Function({ arr -> max(arr[0], arr[1])}, 2),
-        "sin" to Function({ arr -> sin(Math.toRadians(arr[0]))}, 1),
-        "cos" to Function({ arr -> cos(Math.toRadians(arr[0]))}, 1),
-        "tan" to Function({ arr -> tan(Math.toRadians(arr[0])) }, 1),
-        "sinr" to Function({ arr -> sin((arr[0]))}, 1),
-        "cosr" to Function({ arr -> cos((arr[0]))}, 1),
-        "tanr" to Function({ arr -> tan((arr[0])) }, 1),
-        "asin" to Function({ arr -> asin(Math.toRadians(arr[0]))}, 1),
-        "acos" to Function({ arr -> acos(Math.toRadians(arr[0]))}, 1),
-        "atan" to Function({ arr -> atan(Math.toRadians(arr[0])) }, 1),
-        "asinr" to Function({ arr -> asin((arr[0]))}, 1),
-        "acosr" to Function({ arr -> acos((arr[0]))}, 1),
-        "atanr" to Function({ arr -> atan((arr[0])) }, 1),
-        "radians" to Function({ arr -> Math.toRadians(arr[0])}, 1),
-        "deg" to Function({ arr -> Math.toDegrees(arr[0])}, 1),
-        "floor" to Function({ arr -> floor(arr[0])}, 1),
-        "ceil" to Function({ arr -> ceil(arr[0]) }, 1),
-        "round" to Function({ arr -> round(arr[0]) }, 1),
-        "abs" to Function({ arr -> abs(arr[0])}, 1),
-        "sqrt" to Function({ arr -> sqrt(arr[0]) }, 1),
-
+        "min" to Function({ arr -> min(arr[0] as Double, arr[1] as Double) },2),
+        "max" to Function({ arr -> max(arr[0] as Double, arr[1] as Double)}, 2),
+        "sin" to Function({ arr -> sin(Math.toRadians(arr[0] as Double))}, 1),
+        "cos" to Function({ arr -> cos(Math.toRadians(arr[0] as Double))}, 1),
+        "tan" to Function({ arr -> tan(Math.toRadians(arr[0] as Double)) }, 1),
+        "sinr" to Function({ arr -> sin((arr[0] as Double))}, 1),
+        "cosr" to Function({ arr -> cos((arr[0] as Double))}, 1),
+        "tanr" to Function({ arr -> tan((arr[0] as Double)) }, 1),
+        "asin" to Function({ arr -> asin(Math.toRadians(arr[0] as Double))}, 1),
+        "acos" to Function({ arr -> acos(Math.toRadians(arr[0] as Double))}, 1),
+        "atan" to Function({ arr -> atan(Math.toRadians(arr[0] as Double)) }, 1),
+        "asinr" to Function({ arr -> asin((arr[0] as Double))}, 1),
+        "acosr" to Function({ arr -> acos((arr[0] as Double))}, 1),
+        "atanr" to Function({ arr -> atan((arr[0] as Double)) }, 1),
+        "radians" to Function({ arr -> Math.toRadians(arr[0] as Double)}, 1),
+        "deg" to Function({ arr -> Math.toDegrees(arr[0] as Double)}, 1),
+        "floor" to Function({ arr -> floor(arr[0] as Double)}, 1),
+        "ceil" to Function({ arr -> ceil(arr[0] as Double) }, 1),
+        "round" to Function({ arr -> round(arr[0] as Double) }, 1),
+        "abs" to Function({ arr -> abs(arr[0] as Double)}, 1),
+        "sqrt" to Function({ arr -> sqrt(arr[0] as Double) }, 1),
+        "consolelog" to Function({ arr -> println(arr[0]); 0.0}, 1),
     ))
 )
 
@@ -85,7 +85,7 @@ data class ExpressionContext(val modules: ArrayList<Module> = ArrayList()) {
             if (module.hasFunction(name)) return true
         return false
     }
-    fun getFunction(name: String): GenericFunction {
+    fun getFunction(name: String): Function {
         scanFunctionConflicts(name)
         for (module in modules) {
             if (module.hasFunction(name)) return module.getFunction(name)
@@ -110,7 +110,6 @@ open class Module(
     val name: String,
     private val variables: VariableList = VariableList(),
     private val functions: FunctionList = FunctionList(),
-    private val stringFunctions: StringFunctionList = StringFunctionList(),
 ) {
 
     fun getVariable(name: String) = this.variables.getVariable(name.split(':').last())
@@ -123,14 +122,13 @@ open class Module(
 
     fun getFunction(name: String) =
         this.functions.getFunction(name.split(':').last()) ?:
-        this.stringFunctions.getStringFunction(name.split(':').last()) ?:
         throw AssemblyError("function $name is not declared")
 
 
     fun hasFunction(name: String): Boolean {
         val split = name.split(':')
         if (split.size > 2) throw NoSuchFunctionException("celestialexpressions.Function name $name is illegal, cannot have more than one colon")
-        return if (split[0] == this.name || split.size == 1) this.functions.hasFunction(split.last()) || this.stringFunctions.hasStringFunction(split.last())
+        return if (split[0] == this.name || split.size == 1) this.functions.hasFunction(split.last())
         else false
     }
 

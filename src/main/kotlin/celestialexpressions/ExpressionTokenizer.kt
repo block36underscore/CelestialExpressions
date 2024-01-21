@@ -17,9 +17,24 @@ fun splitTokens(input: String): ArrayList<BasicToken> {
         val c = "" + input[i]
 
         // Ignore Whitespace and '#' symbol (for legacy reasons, may be changed in the future)
-        if (Pattern.matches("[\\s#]", c)) continue
-        // Detect splitters
-        if (c.equals(",")) {
+        if (c == "\"" || c == "'") {
+            if (currentTokenType != BasicTokenType.STRING_LITERAL) {
+                addToken(out, input, tokenStart, i, currentTokenType)
+                currentTokenType = BasicTokenType.STRING_LITERAL
+                tokenStart = i+1
+                continue
+            } else if (input[i-1] != '\\') {
+                addToken(out, input, tokenStart, i, currentTokenType)
+                currentTokenType = null
+                continue
+            }
+        } else if (currentTokenType == BasicTokenType.STRING_LITERAL) {
+            continue
+        } else if (Pattern.matches("[\\s#]", c)) continue
+        if (currentTokenType == BasicTokenType.STRING_LITERAL) {
+            continue
+            // Detect splitters
+        } else if (c.equals(",")) {
             addToken(out, input, tokenStart, i, currentTokenType)
             currentTokenType = BasicTokenType.OPERATOR
             tokenStart = i
@@ -75,6 +90,8 @@ fun identifyTokens(input: ArrayList<BasicToken>): ArrayList<Token> {
             Token(token.text,
             when (token.type) {
             BasicTokenType.CONST ->  TokenType.CONST
+
+            BasicTokenType.STRING_LITERAL -> TokenType.STRING_LITERAL
 
             BasicTokenType.VARIABLE ->  TokenType.VARIABLE
 
@@ -132,7 +149,7 @@ class Token(var text: String, var type: TokenType) {
         return "$text: $type"
     }
 
-    fun getExpression(context: ExpressionContext): Expression? {
+    fun getExpression(context: ExpressionContext): IExpression<out Any>? {
         return when (this.type) {
             TokenType.CONST -> Expression.Const(this.text.toDouble())
             TokenType.VARIABLE -> Expression.Var(this.text, context)
@@ -154,6 +171,7 @@ class Token(var text: String, var type: TokenType) {
             TokenType.SPLITTER -> null
             TokenType.GROUPING_START -> null
             TokenType.GROUPING_END -> null
+            TokenType.STRING_LITERAL -> SExpression.Const(this.text)
         }
     }
 }
@@ -161,9 +179,9 @@ class Token(var text: String, var type: TokenType) {
 class ParsingError(s: String) : Exception(s)
 
 enum class BasicTokenType {
-    CONST, VARIABLE, OPERATOR
+    CONST, VARIABLE, OPERATOR, STRING_LITERAL
 }
 
 enum class TokenType {
-    CONST, VARIABLE, NULLARY, UNARY, BINARY, GROUPING_START, GROUPING_END, SPLITTER
+    CONST, VARIABLE, NULLARY, UNARY, BINARY, GROUPING_START, GROUPING_END, SPLITTER, STRING_LITERAL
 }

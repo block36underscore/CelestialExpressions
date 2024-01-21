@@ -4,7 +4,9 @@ package celestialexpressions
 
 import kotlin.math.pow
 
-fun interface Expression: ()->Double {
+fun interface IExpression<T>: ()->T
+
+fun interface Expression: IExpression<Double> {
 
     class Const(val constant: Double) : Expression {
         override fun invoke() = constant
@@ -89,13 +91,15 @@ fun interface Expression: ()->Double {
         constructor(): this(Empty(), Empty())
     }
 
-    class Fun(val params: ArrayList<Expression>, val function: Function) : Expression {
+    class Fun(val function: Function, val params: ArrayList<IExpression<Any>>) : Expression {
         override fun invoke() = function(params)
     }
-    
-    class StrFun(val string: String, val function: StringFunction) : Expression {
-        override fun invoke() = function.invoke(string)
-        override fun toString() = "StrFun(${this.string})"
+
+}
+
+fun interface SExpression: IExpression<String> {
+    class Const(val constant: String) : SExpression {
+        override fun invoke() = constant
     }
 }
 

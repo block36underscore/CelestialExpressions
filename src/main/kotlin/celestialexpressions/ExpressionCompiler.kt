@@ -10,7 +10,7 @@ fun compile(source: String, context: ExpressionContext): Expression =
     splitTokens(
     source)
     )
-    ), context)
+    ), context) as Expression
 
 fun compile(source: String) = compile(source, ExpressionContext())
 
@@ -32,7 +32,7 @@ fun validateExpression(input: ArrayList<Token>) : ArrayList<Token> {
 
 fun assembleExpression(input: ArrayList<Token>, context: ExpressionContext) = buildExpressionTree(input, context).getExpression()
 
-fun getNextExpression(tokens: ListIterator<Token>, context: ExpressionContext): Expression {
+fun getNextExpression(tokens: ListIterator<Token>, context: ExpressionContext): IExpression<out Any> {
     val token = tokens.next()
     return if (token.type == TokenType.GROUPING_START && token.text == "(") {
         val subTokenArray = ArrayList<Token>()
@@ -56,7 +56,7 @@ fun processFunction(token: Token, tokens: ListIterator<Token>, context: Expressi
     val params = ArrayList<ArrayList<Token>>()
     var depth = 1
 
-    scan@while (true) {
+    scan@ while (true) {
         val subTokenArray = ArrayList<Token>()
         while (true) {
             val toAdd = tokens.next()
@@ -67,8 +67,7 @@ fun processFunction(token: Token, tokens: ListIterator<Token>, context: Expressi
                     params.add(subTokenArray)
                     break@scan
                 }
-            }
-            else if (toAdd.type == TokenType.SPLITTER) {
+            } else if (toAdd.type == TokenType.SPLITTER) {
                 if (depth == 1) break
             }
             subTokenArray.add(toAdd)
@@ -77,28 +76,23 @@ fun processFunction(token: Token, tokens: ListIterator<Token>, context: Expressi
     }
 
     val function = context.getFunction(name)
-    return when (function) {
-        is Function -> {
-            val expressions = ArrayList<Expression>()
-            params.forEach {
-                expressions.add(buildExpressionTree(it, context).getExpression())
-            }
-            if (function.size?.equals(params.size) == false) throw InvalidExpressionError(
-                "celestialexpressions.Function $name takes ${function.size} parameter${if (function.size == 1) "" else "s"}, but ${params.size} ${if (params.size == 1) "was" else "were"} provided"
-            )
-            Expression.Fun(expressions, function)
-        }
-        is StringFunction -> Expression.StrFun(params[0][0].text, function)
+    val expressions = ArrayList<IExpression<Any>>()
+    params.forEach {
+        expressions.add(buildExpressionTree(it, context).getExpression())
     }
+    if (function.size?.equals(params.size) == false) throw InvalidExpressionError(
+        "celestialexpressions.Function $name takes ${function.size} parameter${if (function.size == 1) "" else "s"}, but ${params.size} ${if (params.size == 1) "was" else "were"} provided"
+    )
+    return Expression.Fun(function, expressions)
 }
 
 interface ExpressionTreeElement
 
 class ExpressionTreePart(val operator: Expression.BinaryOperator, var element: Expression): ExpressionTreeElement
 
-class ExpressionTree(var start: Expression, val elements: ArrayList<ExpressionTreePart> = ArrayList()):
+class ExpressionTree(var start: IExpression<out Any>, val elements: ArrayList<ExpressionTreePart> = ArrayList()):
     ExpressionTreeElement {
-    fun getExpression(): Expression {
+    fun getExpression(): IExpression<out Any> {
         if (elements.isEmpty()) return this.start
 
         val iter = this.elements.listIterator()
@@ -108,7 +102,7 @@ class ExpressionTree(var start: Expression, val elements: ArrayList<ExpressionTr
             when (element.operator) {
                 is Expression.Pow -> {
                     val combined = element.operator
-                    combined.LHS = getPrevious(index)
+                    combined.LHS = getPrevious(index) as Expression
                     combined.RHS = element.element
                     if (index == 0) this.start = combined
                     else this.elements[index - 1].element = combined
@@ -124,7 +118,7 @@ class ExpressionTree(var start: Expression, val elements: ArrayList<ExpressionTr
             when (element.operator) {
                 is Expression.Mul, is Expression.Div -> {
                     val combined = element.operator
-                    combined.LHS = getPrevious(index)
+                    combined.LHS = getPrevious(index) as Expression
                     combined.RHS = element.element
                     if (index == 0) this.start = combined
                     else this.elements[index - 1].element = combined
@@ -140,7 +134,7 @@ class ExpressionTree(var start: Expression, val elements: ArrayList<ExpressionTr
             when (element.operator) {
                 is Expression.Add, is Expression.Sub -> {
                     val combined = element.operator
-                    combined.LHS = getPrevious(index)
+                    combined.LHS = getPrevious(index) as Expression
                     combined.RHS = element.element
                     if (index == 0) this.start = combined
                     else this.elements[index - 1].element = combined
@@ -156,7 +150,7 @@ class ExpressionTree(var start: Expression, val elements: ArrayList<ExpressionTr
             when (element.operator) {
                 is Expression.And, is Expression.Or, is Expression.Eq, is Expression.Gtr, is Expression.Lss -> {
                     val combined = element.operator
-                    combined.LHS = getPrevious(index)
+                    combined.LHS = getPrevious(index) as Expression
                     combined.RHS = element.element
                     if (index == 0) this.start = combined
                     else this.elements[index - 1].element = combined
@@ -168,15 +162,15 @@ class ExpressionTree(var start: Expression, val elements: ArrayList<ExpressionTr
         return this.start
     }
 
-    fun getPrevious(index: Int): Expression {
+    fun getPrevious(index: Int): IExpression<out Any> {
         if (index == 0) return this.start
         return this.elements[index-1].element
     }
 }
 
-class ExpressionTreeBuilder(var start: Expression) {
+class ExpressionTreeBuilder(var start: IExpression<out Any>) {
     val elements = ArrayList<ExpressionTreePart>()
-    fun add(element: Expression) {
+    fun add(element: IExpression<out Any>) {
         if (element is Expression.BinaryOperator && element.LHS is Expression.Empty && element.RHS is Expression.Empty) this.elements.add(
             ExpressionTreePart(element, Expression.Empty())
         )
@@ -184,15 +178,15 @@ class ExpressionTreeBuilder(var start: Expression) {
             if (this.elements.isEmpty()) {
                 when (this.start) {
                     is Expression.Empty -> this.start = element
-                    is Expression.UnaryOperator -> (this.start as Expression.UnaryOperator).expression = element
-                    else -> this.start = Expression.Mul(this.start, element)
+                    is Expression.UnaryOperator -> (this.start as Expression.UnaryOperator).expression = element as Expression
+                    else -> this.start = Expression.Mul(this.start as Expression, element as Expression)
                 }
             } else {
                 val last = this.elements.last()
                 when (last.element) {
-                    is Expression.Empty -> last.element = element
-                    is Expression.UnaryOperator -> (last.element as Expression.UnaryOperator).expression = element
-                    else -> last.element = Expression.Mul(last.element, element)
+                    is Expression.Empty -> last.element = element as Expression
+                    is Expression.UnaryOperator -> (last.element as Expression.UnaryOperator).expression = element as Expression
+                    else -> last.element = Expression.Mul(last.element, element as Expression)
                 }
             }
         }

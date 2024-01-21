@@ -1,3 +1,0 @@
-package celestialexpressions
-
-sealed interface GenericFunction

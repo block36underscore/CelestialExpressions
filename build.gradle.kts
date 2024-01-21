@@ -8,9 +8,8 @@ import java.net.URI
  * User Manual available at https://docs.gradle.org/7.6/userguide/building_java_projects.html
  */
 
-version = "0.1"
-group = "celestialexpressions"
-
+val githubUser: String by project
+val githubToken: String by project
 
 tasks.jar {
     manifest {
@@ -45,9 +44,6 @@ dependencies {
 
     // This dependency is exported to consumers, that is to say found on their compile classpath.
     api("org.apache.commons:commons-math3:3.6.1")
-
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation("com.google.guava:guava:31.1-jre")
 }
 
 tasks.named<Test>("test") {
@@ -62,18 +58,23 @@ publishing {
             name = "CelestialExpressions"
             url = URI("https://maven.pkg.github.com/block36underscore/CelestialExpressions")
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                username = githubUser
+                password = githubToken
             }
         }
         publications {
             create<MavenPublication>("maven") {
                 groupId = "celestialexpressions"
                 artifactId = "celestialexpressions"
-                version = "1.1"
+                version = "1.2"
 
                 from(components["java"])
             }
         }
     }
+}
+
+tasks.publish {
+    println(githubUser)
+    println(githubToken)
 }
