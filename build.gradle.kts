@@ -73,8 +73,3 @@ publishing {
         }
     }
 }
-
-tasks.publish {
-    println(githubUser)
-    println(githubToken)
-}
