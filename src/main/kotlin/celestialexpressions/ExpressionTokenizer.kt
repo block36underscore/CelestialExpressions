@@ -138,7 +138,7 @@ fun identifyTokens(input: ArrayList<BasicToken>): ArrayList<Token> {
                         if (i==0) TokenType.UNARY
                         else
                             when (array.last().type) {
-                                TokenType.BINARY, TokenType.GROUPING_START, TokenType.UNARY -> TokenType.UNARY
+                                TokenType.BINARY, TokenType.GROUPING_START, TokenType.UNARY, TokenType.SPLITTER -> TokenType.UNARY
                                 else -> TokenType.BINARY
                             }
                     }
