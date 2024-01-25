@@ -84,7 +84,7 @@ fun processFunction(token: Token, tokens: ListIterator<Token>, context: Expressi
     params.forEach {
         expressions.add(buildExpressionTree(it, context).getExpression())
     }
-    if (function.size != params.size) throw InvalidExpressionError(
+    if (function.size != params.size && function.size >= 0.0) throw InvalidExpressionError(
         "celestialexpressions.Function $name takes ${function.size} parameter${if (function.size == 1) "" else "s"}, but ${params.size} ${if (params.size == 1) "was" else "were"} provided"
     )
     return Expression.Fun(function, expressions)

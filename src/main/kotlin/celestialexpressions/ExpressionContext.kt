@@ -28,9 +28,8 @@ val STANDARD_MODULE: Module = Module("std",
 
         )),
     FunctionList(
-        "min" to Function({ arr -> min(arr[0] as Double, arr[1] as Double) },2),
-        "min" to Function({ arr -> min(min(arr[0] as Double, arr[1] as Double), arr[2] as Double)},3),
-        "max" to Function({ arr -> max(arr[0] as Double, arr[1] as Double)}, 2),
+        "min" to Function({ arr -> minOf(arr[0].toDouble(), *arr.toDoubleCollection()) },-1),
+        "max" to Function({ arr -> maxOf(arr[0].toDouble(), *arr.toDoubleCollection()) },-1),
         "sin" to Function({ arr -> sin(Math.toRadians(arr[0] as Double))}, 1),
         "cos" to Function({ arr -> cos(Math.toRadians(arr[0] as Double))}, 1),
         "tan" to Function({ arr -> tan(Math.toRadians(arr[0] as Double)) }, 1),
@@ -53,6 +52,17 @@ val STANDARD_MODULE: Module = Module("std",
         "consolelog" to Function({ arr -> println(arr[0]); 0.0}, 1),
     )
 )
+
+fun Any.toDouble(): Double {
+    return when (this) {
+        is Number -> this.toDouble()
+        is String -> this.toDoubleOrNull() ?: throw NumberFormatException("$this is not a valid number")
+        is Boolean -> if (this) 1.0 else 0.0
+        else -> 0.0
+    }
+}
+
+fun <T> Collection<T>.toDoubleCollection(): Array<Double> = this.map { it?.toDouble() ?: 0.0 }.toTypedArray()
 
 data class ExpressionContext(val modules: ArrayList<Module> = ArrayList()) {
     init {
@@ -90,6 +100,7 @@ data class ExpressionContext(val modules: ArrayList<Module> = ArrayList()) {
         scanFunctionConflicts(name, argCount)
         for (module in modules) {
             if (module.hasFunction(name, argCount)) return module.getFunction(name, argCount)
+            if (module.hasFunction(name, -1)) return module.getFunction(name, -1)
         }
         this.modules.forEach {
             println(it)
