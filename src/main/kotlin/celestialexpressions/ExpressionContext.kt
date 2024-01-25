@@ -27,8 +27,9 @@ val STANDARD_MODULE: Module = Module("std",
         "localHour" to {LocalTime.now().hour.toDouble()}
 
         )),
-    FunctionList(hashMapOf(
+    FunctionList(
         "min" to Function({ arr -> min(arr[0] as Double, arr[1] as Double) },2),
+        "min" to Function({ arr -> min(min(arr[0] as Double, arr[1] as Double), arr[2] as Double)},3),
         "max" to Function({ arr -> max(arr[0] as Double, arr[1] as Double)}, 2),
         "sin" to Function({ arr -> sin(Math.toRadians(arr[0] as Double))}, 1),
         "cos" to Function({ arr -> cos(Math.toRadians(arr[0] as Double))}, 1),
@@ -50,7 +51,7 @@ val STANDARD_MODULE: Module = Module("std",
         "abs" to Function({ arr -> abs(arr[0] as Double)}, 1),
         "sqrt" to Function({ arr -> sqrt(arr[0] as Double) }, 1),
         "consolelog" to Function({ arr -> println(arr[0]); 0.0}, 1),
-    ))
+    )
 )
 
 data class ExpressionContext(val modules: ArrayList<Module> = ArrayList()) {
@@ -80,31 +81,34 @@ data class ExpressionContext(val modules: ArrayList<Module> = ArrayList()) {
         }
         if (found.size > 1) throw ConflictException(name, found)
     }
-    fun hasFunction(name: String): Boolean {
+    fun hasFunction(name: String, argCount: Int): Boolean {
         for (module in modules)
-            if (module.hasFunction(name)) return true
+            if (module.hasFunction(name, argCount)) return true
         return false
     }
-    fun getFunction(name: String): Function {
-        scanFunctionConflicts(name)
+    fun getFunction(name: String, argCount: Int): Function {
+        scanFunctionConflicts(name, argCount)
         for (module in modules) {
-            if (module.hasFunction(name)) return module.getFunction(name)
+            if (module.hasFunction(name, argCount)) return module.getFunction(name, argCount)
         }
-        throw NoSuchFunctionException("No variable named $name is declared")
+        this.modules.forEach {
+            println(it)
+        }
+        throw NoSuchFunctionException("No function named $name with $argCount argument${if (argCount > 1) "s" else ""} is declared")
     }
-    fun scanFunctionConflicts(name: String) {
+    fun scanFunctionConflicts(name: String, argCount: Int) {
         val found = ArrayList<String>()
         for (module in modules) {
-            if (module.hasFunction(name)) found.add(module.name)
+            if (module.hasFunction(name, argCount)) found.add(module.name)
         }
-        if (found.size > 1) throw ConflictException(name, found)
+        if (found.size > 1) throw ConflictException(name, found, "Function")
     }
 }
 
 class NoSuchVariableException(s: String): Exception(s)
 class NoSuchFunctionException(s: String): Exception(s)
-class ConflictException(variable: String, modules: ArrayList<String>):
-    Exception("Variable $variable found in multiple modules: ${modules.joinToString("") {"$it, "}}")
+class ConflictException(variable: String, modules: ArrayList<String>, type:String = "Variable"):
+    Exception("$type $variable found in multiple modules: ${modules.joinToString(", ") {it}}")
 
 open class Module(
     val name: String,
@@ -120,18 +124,25 @@ open class Module(
         else false
     }
 
-    fun getFunction(name: String) =
-        this.functions.getFunction(name.split(':').last()) ?:
+    fun getFunction(name: String, argCount: Int) =
+        this.functions.getFunction(name.split(':').last(), argCount) ?:
         throw AssemblyError("function $name is not declared")
 
 
-    fun hasFunction(name: String): Boolean {
+    fun hasFunction(name: String, argCount: Int): Boolean {
         val split = name.split(':')
         if (split.size > 2) throw NoSuchFunctionException("celestialexpressions.Function name $name is illegal, cannot have more than one colon")
-        return if (split[0] == this.name || split.size == 1) this.functions.hasFunction(split.last())
+        return if (split[0] == this.name || split.size == 1) this.functions.hasFunction(split.last(), argCount)
         else false
     }
 
+    override fun toString(): String {
+        val out = StringBuilder()
+        this.functions.functions.forEach {
+            out.append("${it.key.first}, ${it.key.second}\n")
+        }
+        return out.toString()
+    }
 }
 class ModuleBuilder(val name: String) {
     private val variables = VariableList()

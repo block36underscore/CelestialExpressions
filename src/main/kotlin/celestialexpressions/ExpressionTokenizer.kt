@@ -41,7 +41,7 @@ fun removeIrrelevantChars(input: String): String {
 @Throws(ParsingError::class)
 fun splitTokens(input: String): ArrayList<BasicToken> {
     val out = ArrayList<BasicToken>()
-    if (input.length == 0) return out
+    if (input.isEmpty()) return out
     var currentTokenType: BasicTokenType? = null
     var tokenStart = 0
 

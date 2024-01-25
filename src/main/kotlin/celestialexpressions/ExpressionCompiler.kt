@@ -32,7 +32,8 @@ fun validateExpression(input: ArrayList<Token>) : ArrayList<Token> {
 fun assembleExpression(input: ArrayList<Token>, context: ExpressionContext) = buildExpressionTree(input, context).getExpression()
 
 fun getNextExpression(tokens: ListIterator<Token>, context: ExpressionContext): IExpression<out Any> {
-    val token = tokens.next()
+    var token = tokens.next()
+    while (token.type == TokenType.SPLITTER) token = tokens.next()
     return if (token.type == TokenType.GROUPING_START && token.text == "(") {
         val subTokenArray = ArrayList<Token>()
         var depth = 1
@@ -46,7 +47,8 @@ fun getNextExpression(tokens: ListIterator<Token>, context: ExpressionContext): 
         buildExpressionTree(subTokenArray, context).getExpression()
     } else if (token.type == TokenType.GROUPING_START) {
         processFunction(token, tokens, context)
-    } else if (token.type != TokenType.GROUPING_END) token.getExpression(context)!!
+    } else if (token.type != TokenType.GROUPING_END) {println("${token.type}, ${token.text}"); token.getExpression(context)!!
+    }
     else throw InvalidExpressionError("Attempted to get expression from end grouping symbol. This is guaranteed to be a bug in the compiler")
 }
 
@@ -55,31 +57,34 @@ fun processFunction(token: Token, tokens: ListIterator<Token>, context: Expressi
     val params = ArrayList<ArrayList<Token>>()
     var depth = 1
 
-    scan@ while (true) {
+    var argCount = 1
+    scan@while (true) {
         val subTokenArray = ArrayList<Token>()
         while (true) {
             val toAdd = tokens.next()
-            if (toAdd.type == TokenType.GROUPING_START) depth++
+            if (toAdd.type == TokenType.SPLITTER && depth == 1) {
+                argCount++
+                params.add(subTokenArray)
+                break
+            }
+            else if (toAdd.type == TokenType.GROUPING_START) depth++
             else if (toAdd.type == TokenType.GROUPING_END) {
                 depth--
                 if (depth == 0) {
                     params.add(subTokenArray)
                     break@scan
                 }
-            } else if (toAdd.type == TokenType.SPLITTER) {
-                if (depth == 1) break
             }
             subTokenArray.add(toAdd)
         }
-        params.add(subTokenArray)
     }
 
-    val function = context.getFunction(name)
+    val function = context.getFunction(name, argCount)
     val expressions = ArrayList<IExpression<Any>>()
     params.forEach {
         expressions.add(buildExpressionTree(it, context).getExpression())
     }
-    if (function.size?.equals(params.size) == false) throw InvalidExpressionError(
+    if (function.size != params.size) throw InvalidExpressionError(
         "celestialexpressions.Function $name takes ${function.size} parameter${if (function.size == 1) "" else "s"}, but ${params.size} ${if (params.size == 1) "was" else "were"} provided"
     )
     return Expression.Fun(function, expressions)
@@ -203,7 +208,10 @@ fun buildExpressionTree(input: ArrayList<Token>, context: ExpressionContext): Ex
     val iter = input.listIterator()
     while (iter.hasNext()) {
         if (builder == null) builder = ExpressionTreeBuilder(getNextExpression(iter, context))
-        else builder.add(getNextExpression(iter, context))
+        else {
+            val nextExpression = getNextExpression(iter, context)
+            builder.add(nextExpression)
+        }
     }
     if (builder == null) throw InvalidExpressionError("celestialexpressions.Expression can not be empty")
     return builder.end()
