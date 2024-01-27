@@ -30,32 +30,32 @@ val STANDARD_MODULE: Module = Module("std",
     FunctionList(
         "min" to Function({ arr -> minOf(arr[0].toDouble(), *arr.toDoubleCollection()) },-1),
         "max" to Function({ arr -> maxOf(arr[0].toDouble(), *arr.toDoubleCollection()) },-1),
-        "sin" to Function({ arr -> sin(Math.toRadians(arr[0] as Double))}, 1),
-        "cos" to Function({ arr -> cos(Math.toRadians(arr[0] as Double))}, 1),
-        "tan" to Function({ arr -> tan(Math.toRadians(arr[0] as Double)) }, 1),
-        "sinr" to Function({ arr -> sin((arr[0] as Double))}, 1),
-        "cosr" to Function({ arr -> cos((arr[0] as Double))}, 1),
-        "tanr" to Function({ arr -> tan((arr[0] as Double)) }, 1),
-        "asin" to Function({ arr -> asin(Math.toRadians(arr[0] as Double))}, 1),
-        "acos" to Function({ arr -> acos(Math.toRadians(arr[0] as Double))}, 1),
-        "atan" to Function({ arr -> atan(Math.toRadians(arr[0] as Double)) }, 1),
-        "asinr" to Function({ arr -> asin((arr[0] as Double))}, 1),
-        "acosr" to Function({ arr -> acos((arr[0] as Double))}, 1),
-        "atanr" to Function({ arr -> atan((arr[0] as Double)) }, 1),
-        "radians" to Function({ arr -> Math.toRadians(arr[0] as Double)}, 1),
-        "deg" to Function({ arr -> Math.toDegrees(arr[0] as Double)}, 1),
-        "floor" to Function({ arr -> floor(arr[0] as Double)}, 1),
-        "ceil" to Function({ arr -> ceil(arr[0] as Double) }, 1),
-        "round" to Function({ arr -> round(arr[0] as Double) }, 1),
-        "abs" to Function({ arr -> abs(arr[0] as Double)}, 1),
-        "sqrt" to Function({ arr -> sqrt(arr[0] as Double) }, 1),
+        "sin" to Function({ arr -> sin(Math.toRadians(arr[0].toDouble()))}, 1),
+        "cos" to Function({ arr -> cos(Math.toRadians(arr[0].toDouble()))}, 1),
+        "tan" to Function({ arr -> tan(Math.toRadians(arr[0].toDouble())) }, 1),
+        "sinr" to Function({ arr -> sin((arr[0].toDouble()))}, 1),
+        "cosr" to Function({ arr -> cos((arr[0].toDouble()))}, 1),
+        "tanr" to Function({ arr -> tan((arr[0].toDouble())) }, 1),
+        "asin" to Function({ arr -> asin(Math.toRadians(arr[0].toDouble()))}, 1),
+        "acos" to Function({ arr -> acos(Math.toRadians(arr[0].toDouble()))}, 1),
+        "atan" to Function({ arr -> atan(Math.toRadians(arr[0].toDouble())) }, 1),
+        "asinr" to Function({ arr -> asin((arr[0].toDouble()))}, 1),
+        "acosr" to Function({ arr -> acos((arr[0].toDouble()))}, 1),
+        "atanr" to Function({ arr -> atan((arr[0].toDouble())) }, 1),
+        "radians" to Function({ arr -> Math.toRadians(arr[0].toDouble())}, 1),
+        "deg" to Function({ arr -> Math.toDegrees(arr[0].toDouble())}, 1),
+        "floor" to Function({ arr -> floor(arr[0].toDouble())}, 1),
+        "ceil" to Function({ arr -> ceil(arr[0].toDouble()) }, 1),
+        "round" to Function({ arr -> round(arr[0].toDouble()) }, 1),
+        "abs" to Function({ arr -> abs(arr[0].toDouble())}, 1),
+        "sqrt" to Function({ arr -> sqrt(arr[0].toDouble()) }, 1),
         "consolelog" to Function({ arr -> println(arr[0]); 0.0}, 1),
     )
 )
 
 fun Any.toDouble(): Double {
     return when (this) {
-        is Number -> this.toDouble()
+        is Number -> this.toDouble()}
         is String -> this.toDoubleOrNull() ?: throw NumberFormatException("\"$this\" is not a valid number.")
         is Boolean -> if (this) 1.0 else 0.0
         else -> 0.0
