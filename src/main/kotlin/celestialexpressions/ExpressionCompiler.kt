@@ -49,7 +49,7 @@ fun getNextExpression(tokens: ListIterator<Token>, context: ExpressionContext): 
         processFunction(token, tokens, context)
     } else if (token.type != TokenType.GROUPING_END) {println("${token.type}, ${token.text}"); token.getExpression(context)!!
     }
-    else throw InvalidExpressionError("Attempted to get expression from end grouping symbol. This is guaranteed to be a bug in the compiler")
+    else throw InvalidExpressionError("Attempted to get expression from end grouping symbol. This is likely a bug in the compiler.")
 }
 
 fun processFunction(token: Token, tokens: ListIterator<Token>, context: ExpressionContext): Expression {
@@ -85,7 +85,7 @@ fun processFunction(token: Token, tokens: ListIterator<Token>, context: Expressi
         expressions.add(buildExpressionTree(it, context).getExpression())
     }
     if (function.size != params.size && function.size >= 0.0) throw InvalidExpressionError(
-        "celestialexpressions.Function $name takes ${function.size} parameter${if (function.size == 1) "" else "s"}, but ${params.size} ${if (params.size == 1) "was" else "were"} provided"
+        "Function \"$name\" takes ${function.size} parameter${if (function.size == 1) "" else "s"}, but ${params.size} ${if (params.size == 1) "was" else "were"} provided."
     )
     return Expression.Fun(function, expressions)
 }
@@ -213,7 +213,7 @@ fun buildExpressionTree(input: ArrayList<Token>, context: ExpressionContext): Ex
             builder.add(nextExpression)
         }
     }
-    if (builder == null) throw InvalidExpressionError("celestialexpressions.Expression can not be empty")
+    if (builder == null) throw InvalidExpressionError("Expression must have a value.")
     return builder.end()
 }
 

@@ -10,8 +10,8 @@ class ExpressionRegistrar {
     }
 
     fun registerModule(name: String, module: Module) {
-        if (name == "std" || name == "local") throw RegistrationError("Name of module can not be $name, as that name is reserved internally")
-        if (modules.containsKey(name)) throw RegistrationError("celestialexpressions.Module named $name is already registered")
+        if (name == "std" || name == "local") throw RegistrationError("Module cannot be named \"$name\", as that name is reserved internally.")
+        if (modules.containsKey(name)) throw RegistrationError("Module named \"$name\" has already been registered.")
         this.modules.putIfAbsent(name, module)
     }
 
@@ -28,4 +28,4 @@ class ExpressionRegistrar {
 }
 
 class RegistrationError(s: String): Exception(s)
-class MissingModuleError(name: String): Exception("celestialexpressions.Module $name not registered")
+class MissingModuleError(name: String): Exception("Module \"$name\" is not registered.")

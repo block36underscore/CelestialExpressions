@@ -56,7 +56,7 @@ val STANDARD_MODULE: Module = Module("std",
 fun Any.toDouble(): Double {
     return when (this) {
         is Number -> this.toDouble()
-        is String -> this.toDoubleOrNull() ?: throw NumberFormatException("$this is not a valid number")
+        is String -> this.toDoubleOrNull() ?: throw NumberFormatException("\"$this\" is not a valid number.")
         is Boolean -> if (this) 1.0 else 0.0
         else -> 0.0
     }
@@ -81,7 +81,7 @@ data class ExpressionContext(val modules: ArrayList<Module> = ArrayList()) {
         for (module in modules) {
             if (module.hasVariable(name)) return module.getVariable(name)
         }
-        throw NoSuchVariableException("No variable named $name is declared")
+        throw NoSuchVariableException("No variable named \"$name\" is declared.")
     }
 
     fun scanVariableConflicts(name: String) {
@@ -105,7 +105,7 @@ data class ExpressionContext(val modules: ArrayList<Module> = ArrayList()) {
         this.modules.forEach {
             println(it)
         }
-        throw NoSuchFunctionException("No function named $name with $argCount argument${if (argCount > 1) "s" else ""} is declared")
+        throw NoSuchFunctionException("No function named \"$name\" with $argCount argument${if (argCount > 1) "s" else ""} is declared.")
     }
     fun scanFunctionConflicts(name: String, argCount: Int) {
         val found = ArrayList<String>()
@@ -119,7 +119,7 @@ data class ExpressionContext(val modules: ArrayList<Module> = ArrayList()) {
 class NoSuchVariableException(s: String): Exception(s)
 class NoSuchFunctionException(s: String): Exception(s)
 class ConflictException(variable: String, modules: ArrayList<String>, type:String = "Variable"):
-    Exception("$type $variable found in multiple modules: ${modules.joinToString(", ") {it}}")
+    Exception("$type \"$variable\" found in multiple modules: ${modules.joinToString(", ") {it}}.")
 
 open class Module(
     val name: String,
@@ -130,19 +130,19 @@ open class Module(
     fun getVariable(name: String) = this.variables.getVariable(name.split(':').last())
     fun hasVariable(name: String): Boolean {
         val split = name.split(':')
-        if (split.size > 2) throw NoSuchVariableException("Variable name $name is illegal, cannot have more than one colon")
+        if (split.size > 2) throw NoSuchVariableException("Illegal variable name \"$name\", cannot have more than one colon.")
         return if (split[0] == this.name || split.size == 1) this.variables.hasVariable(split.last())
         else false
     }
 
     fun getFunction(name: String, argCount: Int) =
         this.functions.getFunction(name.split(':').last(), argCount) ?:
-        throw AssemblyError("function $name is not declared")
+        throw AssemblyError("Function \"$name\" is not declared.")
 
 
     fun hasFunction(name: String, argCount: Int): Boolean {
         val split = name.split(':')
-        if (split.size > 2) throw NoSuchFunctionException("celestialexpressions.Function name $name is illegal, cannot have more than one colon")
+        if (split.size > 2) throw NoSuchFunctionException("Illegal function name \"$name\", cannot have more than one colon.")
         return if (split[0] == this.name || split.size == 1) this.functions.hasFunction(split.last(), argCount)
         else false
     }

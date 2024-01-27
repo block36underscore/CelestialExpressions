@@ -20,7 +20,7 @@ fun interface Expression: IExpression<Double> {
     }
 
     class Empty: Expression {
-        override fun invoke() = throw ExecutionError("celestialexpressions.Expression was executed before it was fully processed.")
+        override fun invoke() = throw ExecutionError("Expression was executed before it was fully processed.")
         override fun toString() = "Empty"
     }
 

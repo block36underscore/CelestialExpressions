@@ -11,7 +11,7 @@ class FunctionList(val functions: MutableMap<Pair<String, Int>, Function> = Hash
     }
 
     fun registerFunction(name: String, function: Function) {
-        if (functions.containsKey(name to function.size)) throw IllegalArgumentException("$name is already registered")
+        if (functions.containsKey(name to function.size)) throw IllegalArgumentException("Function \"$name\" is already registered.")
         functions[name to function.size] = function
     }
 

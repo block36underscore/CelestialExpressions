@@ -81,7 +81,7 @@ fun splitTokens(input: String): ArrayList<BasicToken> {
                 tokenStart = i
             }
             if (c == ".") {
-                if (dots >= 1) throw ParsingError("Multiple periods in one decimal number at index $i")
+                if (dots >= 1) throw ParsingError("Multiple periods in one decimal number at index $i.")
                 dots++
             }
             // Detect operators and grouping symbols
@@ -150,7 +150,7 @@ fun identifyTokens(input: ArrayList<BasicToken>): ArrayList<Token> {
                             ',' -> TokenType.SPLITTER
                             else -> {
                                 if (iter.next().text == "(") TokenType.GROUPING_START
-                                else throw ParsingError("This exception should theoretically never happen. Congratulations")
+                                else throw ParsingError("Please report this exception.")
                             }
                         }
                     }
@@ -200,7 +200,7 @@ class Token(var text: String, var type: TokenType) {
                 "=" -> Expression.Eq()
                 ">" -> Expression.Gtr()
                 "<" -> Expression.Lss()
-                else -> throw ParsingError("Invalid Character was somehow not caught. This should  theoretically never be thrown")
+                else -> throw ParsingError("Invalid character was not caught. Please report this exception.")
             }
             TokenType.SPLITTER -> null
             TokenType.GROUPING_START -> null
