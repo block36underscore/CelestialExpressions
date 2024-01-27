@@ -55,7 +55,7 @@ val STANDARD_MODULE: Module = Module("std",
 
 fun Any.toDouble(): Double {
     return when (this) {
-        is Number -> this.toDouble()}
+        is Number -> this.toDouble()
         is String -> this.toDoubleOrNull() ?: throw NumberFormatException("\"$this\" is not a valid number.")
         is Boolean -> if (this) 1.0 else 0.0
         else -> 0.0
