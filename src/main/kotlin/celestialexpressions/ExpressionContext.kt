@@ -127,20 +127,20 @@ open class Module(
     protected val functions: FunctionList = FunctionList(),
 ) {
 
-    fun getVariable(name: String) = this.variables.getVariable(name.split(':').last())
-    fun hasVariable(name: String): Boolean {
+    open fun getVariable(name: String) = this.variables.getVariable(name.split(':').last())
+    open fun hasVariable(name: String): Boolean {
         val split = name.split(':')
         if (split.size > 2) throw NoSuchVariableException("Illegal variable name \"$name\", cannot have more than one colon.")
         return if (split[0] == this.name || split.size == 1) this.variables.hasVariable(split.last())
         else false
     }
 
-    fun getFunction(name: String, argCount: Int) =
+    open fun getFunction(name: String, argCount: Int) =
         this.functions.getFunction(name.split(':').last(), argCount) ?:
         throw AssemblyError("Function \"$name\" is not declared.")
 
 
-    fun hasFunction(name: String, argCount: Int): Boolean {
+    open fun hasFunction(name: String, argCount: Int): Boolean {
         val split = name.split(':')
         if (split.size > 2) throw NoSuchFunctionException("Illegal function name \"$name\", cannot have more than one colon.")
         return if (split[0] == this.name || split.size == 1) this.functions.hasFunction(split.last(), argCount)
