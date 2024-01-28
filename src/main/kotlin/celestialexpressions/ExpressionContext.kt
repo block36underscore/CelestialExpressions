@@ -122,7 +122,7 @@ class ConflictException(variable: String, modules: ArrayList<String>, type:Strin
     Exception("$type \"$variable\" found in multiple modules: ${modules.joinToString(", ") {it}}.")
 
 open class Module(
-    protected val name: String,
+    public val name: String,
     protected val variables: VariableList = VariableList(),
     protected val functions: FunctionList = FunctionList(),
 ) {
