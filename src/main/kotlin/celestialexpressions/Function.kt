@@ -1,6 +1,6 @@
 package celestialexpressions
 
-class FunctionList(val functions: MutableMap<Pair<String, Int>, Function> = HashMap()) {
+open class FunctionList(val functions: MutableMap<Pair<String, Int>, Function> = HashMap()) {
 
     companion object {
         operator fun invoke(functions: Map<String, Function>) =
@@ -10,14 +10,14 @@ class FunctionList(val functions: MutableMap<Pair<String, Int>, Function> = Hash
             FunctionList(hashMapOf(*functions.map { (it.first to it.second.size) to it.second }.toTypedArray()))
     }
 
-    fun registerFunction(name: String, function: Function) {
+    open fun registerFunction(name: String, function: Function) {
         if (functions.containsKey(name to function.size)) throw IllegalArgumentException("Function \"$name\" is already registered.")
         functions[name to function.size] = function
     }
 
-    fun getFunction(name: String, argCount: Int) = functions[name to argCount]
+    open fun getFunction(name: String, argCount: Int) = functions[name to argCount]
 
-    fun hasFunction(name: String, argCount: Int) = functions.containsKey(name to argCount)
+    open fun hasFunction(name: String, argCount: Int) = functions.containsKey(name to argCount)
 }
 
 class Function(val supplier: (List<Any>)->Double, val size: Int) {
