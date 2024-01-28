@@ -122,9 +122,9 @@ class ConflictException(variable: String, modules: ArrayList<String>, type:Strin
     Exception("$type \"$variable\" found in multiple modules: ${modules.joinToString(", ") {it}}.")
 
 open class Module(
-    val name: String,
-    private val variables: VariableList = VariableList(),
-    private val functions: FunctionList = FunctionList(),
+    protected val name: String,
+    protected val variables: VariableList = VariableList(),
+    protected val functions: FunctionList = FunctionList(),
 ) {
 
     fun getVariable(name: String) = this.variables.getVariable(name.split(':').last())
