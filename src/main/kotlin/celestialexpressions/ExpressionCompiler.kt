@@ -47,7 +47,8 @@ fun getNextExpression(tokens: ListIterator<Token>, context: ExpressionContext): 
         buildExpressionTree(subTokenArray, context).getExpression()
     } else if (token.type == TokenType.GROUPING_START) {
         processFunction(token, tokens, context)
-    } else if (token.type != TokenType.GROUPING_END) {println("${token.type}, ${token.text}"); token.getExpression(context)!!
+    } else if (token.type != TokenType.GROUPING_END) {
+        /*println("${token.type}, ${token.text}");*/ token.getExpression(context)!!
     }
     else throw InvalidExpressionError("Attempted to get expression from end grouping symbol. This is likely a bug in the compiler.")
 }

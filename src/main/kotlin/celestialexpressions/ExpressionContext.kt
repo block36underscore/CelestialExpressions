@@ -102,9 +102,9 @@ data class ExpressionContext(val modules: ArrayList<Module> = ArrayList()) {
             if (module.hasFunction(name, argCount)) return module.getFunction(name, argCount)
             if (module.hasFunction(name, -1)) return module.getFunction(name, -1)
         }
-        this.modules.forEach {
+        /*this.modules.forEach {
             println(it)
-        }
+        }*/
         throw NoSuchFunctionException("No function named \"$name\" with $argCount argument${if (argCount > 1) "s" else ""} is declared.")
     }
     fun scanFunctionConflicts(name: String, argCount: Int) {
