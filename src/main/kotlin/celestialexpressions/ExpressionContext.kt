@@ -26,7 +26,8 @@ val STANDARD_MODULE: Module = Module("std",
         "localSecondOfDay" to {(((LocalDate.now().atTime(LocalTime.now()).getHour() * 60) + LocalDate.now().atTime(LocalTime.now()).getMinute() * 60) + LocalDate.now().atTime(LocalTime.now()).getSecond()).toDouble()},
         "localMinuteOfDay" to {((LocalDate.now().atTime(LocalTime.now()).getHour() * 60) + LocalDate.now().atTime(LocalTime.now()).getMinute()).toDouble()},
         "localHour" to {LocalTime.now().hour.toDouble()},
-        "epochMilli" to { Instant.now().toEpochMilli().toDouble() }
+        "epochMilli" to { Instant.now().toEpochMilli().toDouble() },
+        "random" to {Math.random()},
         )),
     FunctionList(
         "min" to Function({ arr -> minOf(arr[0].toDouble(), *arr.toDoubleCollection()) },-1),
@@ -51,7 +52,7 @@ val STANDARD_MODULE: Module = Module("std",
         "abs" to Function({ arr -> abs(arr[0].toDouble())}, 1),
         "sqrt" to Function({ arr -> sqrt(arr[0].toDouble()) }, 1),
         "consolelog" to Function({ arr -> println(arr[0]); 0.0}, 1),
-        "ifElse" to Function({arr -> if (arr[0].toDouble() != 0.0) { arr[1].toDouble() } else { arr[2].toDouble() } }, 3)
+        "ifElse" to Function({arr -> if (arr[0].toDouble() != 0.0) { arr[1].toDouble() } else { arr[2].toDouble() } }, 3),
     )
 )
 
