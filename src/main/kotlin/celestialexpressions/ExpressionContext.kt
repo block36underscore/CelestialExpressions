@@ -15,6 +15,7 @@ val STANDARD_MODULE: Module = Module("std",
         "minInteger" to {Int.MIN_VALUE.toDouble()},
         "maxDouble" to {Double.MAX_VALUE},
         "minDouble" to {Double.MIN_VALUE},
+        "random" to {Math.random()},
         "localDayOfYear" to {LocalDate.now().dayOfYear.toDouble()},
         "localDayOfMonth" to {LocalDate.now().dayOfMonth.toDouble()},
         "localDayOfWeek" to {LocalDate.now().dayOfWeek.value.toDouble()},
@@ -50,6 +51,9 @@ val STANDARD_MODULE: Module = Module("std",
         "abs" to Function({ arr -> abs(arr[0].toDouble())}, 1),
         "sqrt" to Function({ arr -> sqrt(arr[0].toDouble()) }, 1),
         "consolelog" to Function({ arr -> println(arr[0]); 0.0}, 1),
+        "ifElse" to Function({
+            arr -> if (arr[0].toDouble() == 1) arr[1] else arr[2];
+        }, 3)
     )
 )
 
