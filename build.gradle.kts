@@ -54,14 +54,6 @@ tasks.named<Test>("test") {
 
 publishing {
     repositories {
-        maven {
-            name = "CelestialExpressions"
-            url = URI("https://maven.pkg.github.com/block36underscore/CelestialExpressions")
-            credentials {
-                username = githubUser
-                password = githubToken
-            }
-        }
         publications {
             create<MavenPublication>("maven") {
                 groupId = "celestialexpressions"
