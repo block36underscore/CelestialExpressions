@@ -81,7 +81,7 @@ public class ExpressionTokenizer {
                     currentTokenType = BasicToken.Type.CONST;
                     tokenStart = i;
                 }
-                if (c == ".") {
+                if (c.equals(".")) {
                     if (dots >= 1) throw new Token.ParsingException("Multiple periods in one decimal number at index $i.");
                     dots++;
                 }
@@ -171,6 +171,7 @@ public class ExpressionTokenizer {
                                     break;
                                 default: type = Token.Type.BINARY;
                             }
+                            break;
                         case ")":
                             type = Token.Type.GROUPING_END;
                             break;
