@@ -238,14 +238,6 @@ public class ExpressionCompiler {
             }
         }
 
-        for (Module mod : context.getModules()) {
-            for (Function.Signature func : mod.getFunctions().functions.keySet()) {
-                System.out.println(func.name + ":" + func.args);
-            }
-        }
-
-        System.out.println(context.hasFunction("sin", 1));
-
         Function function = context.getFunction(name, argCount);
         ArrayList<IExpression<?>> expressions = new ArrayList<>();
         for (ArrayList<Token> it : params) {
